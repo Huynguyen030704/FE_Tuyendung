@@ -44,7 +44,7 @@ function App() {
   const fetchDataFromMongoDB = async () => {
     try {
       const response = await axios.get(
-        "https://tuyendung-vlh.onrender.com/api/admin/users"
+        "http://tuyendung.vietlonghung.com.vn:30002/api/admin/users"
       );
       setItems(response.data);
       console.log(response.data);
@@ -142,7 +142,7 @@ function App() {
   const handleExport = async () => {
     try {
       const response = await axios.get(
-        "https://tuyendung-vlh.onrender.com/export"
+        "http://tuyendung.vietlonghung.com.vn:30002/export"
       );
       console.log(response.data);
       alert(response.data);
@@ -159,7 +159,7 @@ function App() {
     if (confirmation) {
       try {
         const response = await axios.delete(
-          "https://tuyendung-vlh.onrender.com/api/delete-all"
+          "http://tuyendung.vietlonghung.com.vn:30002/api/delete-all"
         );
         alert(response.data.message);
         fetchDataFromMongoDB(); // Fetch data lại sau khi xóa
@@ -174,7 +174,7 @@ function App() {
   const deleteData = (id) => {
     console.log(id);
     try {
-      axios.delete(`https://tuyendung-vlh.onrender.com/api/data/${id}`);
+      axios.delete(`http://tuyendung.vietlonghung.com.vn:30002/api/data/${id}`);
       // return;
       console.log("Data deleted successfully");
       setEventTriggered(true);
