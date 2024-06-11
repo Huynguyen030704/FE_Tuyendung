@@ -1030,7 +1030,7 @@ const Form = () => {
   const [selectedTongiao, setSelectedTongiao] = useState("");
   const [selectedNoiCapCCCD, setSelectedNoiCapCCCD] = useState("");
   const [selectedMoiquanhech, setSelectedMoiquanhech] = useState("");
-
+  const [idVLH, setIdVLH] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   // Xử lý sự kiện thay đổi lựa chọn Tỉnh
@@ -1139,8 +1139,8 @@ const Form = () => {
     if (answer === "Đồng ý") {
       try {
         await axios.put(
-          //`https://tuyendung-vlh.onrender.com/api/updata/${cccd}`,
-          `http://171.244.39.87:30002/api/updata/${cccd}`,
+          `https://tuyendung-vlh.onrender.com/api/updata/${cccd}`,
+          // `http://localhost:7573/api/updata/${cccd}`,
           data
         );
 
@@ -1165,11 +1165,10 @@ const Form = () => {
       //   `http://tuyendung.vietlonghung.com.vn:7573/api/search/${cccd}`
       // );
       // const response = await axios.get(
-      //   `https://tuyendung-vlh.onrender.com/api/search/${cccd}`
+      //   `http://localhost:7573/api/search/${cccd}`
       // );
       const response = await axios.get(
-        // `https://tuyendung-vlh.onrender.com/api/search/${cccd}`
-        `http://171.244.39.87:30002/api/search/${cccd}`
+        `https://tuyendung-vlh.onrender.com/api/search/${cccd}`
       );
       setDataForm(response.data);
       setIsLoading(true);
@@ -1266,14 +1265,7 @@ const Form = () => {
               className="input-field"
             />
             <label>Ngày cấp Căn cước công dân/ Chứng minh nhân dân</label>
-            {/* <input
-              type="date"
-              name="ngaycapcccd"
-              value={formData.ngaycapcccd}
-              onChange={handleChange}
-              placeholder="Ngày cấp Căn cước công dân/ Chứng minh nhân dân"
-              className="input-field"
-            /> */}
+
             <DatePicker
               selected={formData.ngaycapcccd}
               onChange={(date) => handleDateChange(date, "ngaycapcccd")}
@@ -1491,17 +1483,6 @@ const Form = () => {
               placeholder="Ngoại ngữ"
               className="input-field"
             />
-            <label>Email</label>
-            <span>Ví dụ: abc123@gmail.com (Không có thì ghi không)</span>
-            <input
-              type="email"
-              name="email"
-              disabled
-              value={dataForm.email}
-              onChange={handleChange}
-              placeholder="Email"
-              className="input-field"
-            />
             <label>Số điện thoại (Vui lòng nhập đủ 10 chữ số)</label>
             <input
               type="number"
@@ -1513,6 +1494,44 @@ const Form = () => {
               placeholder="Số điện thoại"
               className="input-field"
             />
+            <label>Email</label>
+            <span>Ví dụ: abc123@gmail.com (Không có thì ghi không)</span>
+            <input
+              type="email"
+              name="email"
+              disabled
+              value={dataForm.email}
+              onChange={handleChange}
+              placeholder="Email"
+              className="input-field"
+            />
+            <label>Bạn biết thông tin tuyển dụng qua đâu?</label>
+            <input
+              type="text"
+              name="fullname"
+              disabled
+              value={dataForm.tttd}
+              onChange={handleChange}
+              placeholder="Bạn biết thông tin tuyển dụng qua đâu?"
+              className="input-field"
+            />
+            {dataForm.tttd === "Người thân giới thiệu" && (
+              <>
+                <label>
+                  Nếu người thân Anh/Chị làm tại Việt Long Hưng vui lòng điền số
+                  thẻ công nhân viên của người thân.
+                  <br />
+                  Nếu không có vui lòng điền KHÔNG CÓ.
+                </label>
+                <input
+                  type="text"
+                  value={formData.sothe}
+                  onChange={handleChange}
+                  className="input-field"
+                  placeholder="Mã nhân viên của người thân"
+                />
+              </>
+            )}
             <label>Địa chỉ thường trú - Tỉnh</label>
             <select value={selectedTinh} onChange={handleTinhChange}>
               <option value="">Chọn Tỉnh</option>
