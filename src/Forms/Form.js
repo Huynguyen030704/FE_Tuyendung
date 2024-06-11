@@ -1139,8 +1139,8 @@ const Form = () => {
     if (answer === "Đồng ý") {
       try {
         await axios.put(
-          `https://tuyendung-vlh.onrender.com/api/updata/${cccd}`,
-          // `http://localhost:7573/api/updata/${cccd}`,
+          // `https://tuyendung-vlh.onrender.com/api/updata/${cccd}`,
+          `http://171.244.39.87:30002/api/updata/${cccd}`,
           data
         );
 
