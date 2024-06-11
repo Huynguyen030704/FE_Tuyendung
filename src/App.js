@@ -46,14 +46,9 @@ function App() {
   const [targetDate, setTargetDate] = useState("");
   const [selectedTTTD, setSelectedTTTD] = useState("");
   const [showForm, SetShowForm] = useState(true);
-  const [idVLH, setIdVLH] = useState("");
 
   const handleNameChange = (e) => {
     setFullname(e.target.value);
-  };
-
-  const handleIdVLhChange = (e) => {
-    setIdVLH(e.target.value);
   };
 
   const handleEmailChange = (e) => {
@@ -134,7 +129,6 @@ function App() {
       formData.append("chuyenmon", tdcm);
       formData.append("chuyennganh", chuyennganh);
       formData.append("vtut", vtut);
-      formData.append("sothe", idVLH);
       formData.append("tttd", selectedTTTD);
       formData.append("images", image1);
       formData.append("images", image2);
@@ -142,9 +136,7 @@ function App() {
       const response = await axios.post(
         // "http://tuyendung.vietlonghung.com.vn/api/register",
         // "http://localhost:7573/api/register",
-        // "https://tuyendung-vlh.onrender.com/api/register",
-        
-          "http://171.244.39.87:30002/api/register"
+        "https://tuyendung-vlh.onrender.com/api/register",
         formData,
         {
           headers: {
@@ -185,18 +177,76 @@ function App() {
             <img
               className="img img-m"
               alt="Ảnh Công ty Việt Long Hưng"
-              src="https://i.imgur.com/OER6j6Z.jpeg"
+              src="https://i.imgur.com/eJpEKzv.jpeg"
             />
-            <img
-              className="img"
-              alt="Values"
-              src="https://i.imgur.com/73iHnB7.jpeg"
-            />
-            <img
-              className="img"
-              alt="Vision&Mission"
-              src="https://i.imgur.com/easItyt.jpeg"
-            />
+
+            <div className="_section">
+              <div class="_title_sub">
+                <img className="_img" src="https://i.imgur.com/ZK5liMX.jpeg" />
+                <div>
+                  <p class="text vn">
+                    Liên tục đổi mới
+                    <span className="mb-en en"> Constantly innovation: </span>
+                    Chúng tôi không ngừng học hỏi, sáng tạo, liên tục đổi mới
+                    phương thức quản lý, nỗ lực dẫn đầu công nghệ và sản xuất
+                    sản phẩm mới.{" "}
+                    <span class="text en mb-text_en">
+                      We constantly learn, create, continuouly innovate
+                      management method, strive to lead in technology and
+                      produce new products
+                    </span>
+                  </p>
+                  <p class="text vn">
+                    Khách hàng là trọng tâm
+                    <span className="en"> Customer focus:</span> Yếu tố then
+                    chốt trong hoạt động điều hành của chúng tôi là cung cấp
+                    chất lượng sản phẩm dịch vụ vượt trội, gắn kết và phát triển
+                    bền vững cùng khách hàng.{" "}
+                    <span class="text en">
+                      The key element in our operation management is to provide
+                      outstanding quality of products and services, align
+                      suitable development with our customers.
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <section class="_section">
+              <div className="_title_sub">
+                <img className="_img" src="https://i.imgur.com/E4trgML.jpeg" />
+
+                <div>
+                  TẦM NHÌN -<span class="mb-en en"> VISION</span>
+                  <p class="text vn">
+                    Trở thành nhà sản xuất tin tưởng của thương hiệu hàng đầu
+                    thế giới.{" "}
+                    <span class="text en mb-text">
+                      Become the trusted manufacturer of world's leading brands.
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="_title_sub">
+                <img className="_img" src="https://i.imgur.com/kLMfmXc.jpeg" />
+                <div>
+                  SỨ MỆNH - <span class="en">MISSION</span>
+                  <p class="text vn">
+                    Không ngừng nâng cao Trách nhiệm xã hội, Văn hóa An toàn và
+                    Chất lượng, Cải tiến liên tục và Phát triển Bền vững nhắm
+                    mang chất lượng sản phẩm và dịch vụ vượt trội* đến khách
+                    hàng.{" "}
+                    <span class="text en">
+                      Continuously improve Social Responsibility, Culture of
+                      Safety and Quality, Continuous Improvement and Sustainable
+                      Develepment to bring out standing products and services to
+                      the customers.
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </section>
           </div>
 
           <button className="animated-button" onClick={handleShowForm}>
@@ -344,26 +394,9 @@ function App() {
                 Người thân giới thiệu
               </option>
             </select>
-            {selectedTTTD === "Người thân giới thiệu" && (
-              <>
-                <label>
-                  Nếu người thân Anh/Chị làm tại Việt Long Hưng vui lòng điền số
-                  thẻ công nhân viên của người thân.
-                  <br />
-                  Nếu không có vui lòng điền KHÔNG CÓ.
-                </label>
-                <input
-                  type="text"
-                  value={idVLH}
-                  onChange={handleIdVLhChange}
-                  className="input-field"
-                  placeholder="Chuyên ngành của Ứng viên"
-                />
-              </>
-            )}
             <h2>
               Sau khi đã điền đầy đủ thông tin ứng tuyển, bạn vui lòng gửi hình
-              ảnh 2 mặt Căn cước công dân/Chứng minh nhân dân để Bộ phận Nhân sự
+              ảnh 2 mặt Căn cước công dân/Chứng minh nhân dân để Phòng Nhân sự
               của Công ty hoàn thiện thủ tục hồ sơ ứng tuyển.
             </h2>
             <label>

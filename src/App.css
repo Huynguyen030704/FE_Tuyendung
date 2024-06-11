@@ -3,7 +3,10 @@ body {
 }
 
 .img {
-  width: 800px;
+  width: 900px;
+  height: 250px;
+  object-fit: cover;
+  object-position: 100% 45%;
 }
 
 .img-m {
@@ -11,7 +14,7 @@ body {
 }
 
 .registration-form-container {
-  max-width: 700px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -154,7 +157,6 @@ select {
 }
 
 .animated-button:active {
-  scale: 0.95;
   box-shadow: 0 0 0 4px greenyellow;
 }
 
@@ -162,6 +164,28 @@ select {
   width: 220px;
   height: 220px;
   opacity: 1;
+}
+
+._section {
+  margin: 0 auto;
+  width: 900px;
+  background-color: #fff;
+}
+
+._title_sub {
+  padding: 20px 15px 0 15px;
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+}
+
+._img {
+  padding-right: 15px;
+  width: 15%;
+}
+
+.en {
+  color: #0ad8eb;
 }
 
 @media only screen and (max-width: 600px) {
