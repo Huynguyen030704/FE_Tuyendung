@@ -1161,15 +1161,15 @@ const Form = () => {
     console.log(cccd);
     e.preventDefault();
     try {
-      // const response = await axios.get(
-      //   `http://tuyendung.vietlonghung.com.vn:7573/api/search/${cccd}`
-      // );
+      const response = await axios.get(
+        `http://171.244.39.87:30002/api/search/${cccd}`
+      );
       // const response = await axios.get(
       //   `http://localhost:7573/api/search/${cccd}`
       // );
-      const response = await axios.get(
-        `https://tuyendung-vlh.onrender.com/api/search/${cccd}`
-      );
+      // const response = await axios.get(
+      //   `https://tuyendung-vlh.onrender.com/api/search/${cccd}`
+      // );
       setDataForm(response.data);
       setIsLoading(true);
       setError("");
