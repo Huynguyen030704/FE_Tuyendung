@@ -1,426 +1,334 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { format } from "date-fns";
 import "./App.css";
-import { registerLocale, setDefaultLocale } from "react-datepicker";
-import vi from "date-fns/locale/vi"; // Import locale tiếng Việt
+import axios from "axios";
+import * as XLSX from "xlsx";
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBKGOMyHVPHaAwRmlod2np8YFwWqxO8T6M",
-  authDomain: "vlh-tuyendung.firebaseapp.com",
-  projectId: "vlh-tuyendung",
-  storageBucket: "vlh-tuyendung.appspot.com",
-  messagingSenderId: "736260500988",
-  appId: "1:736260500988:web:7640b1ed76bcde97ee1679",
-  measurementId: "G-92FTPRYJZC",
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 
 function App() {
-  registerLocale("vi", vi); // Đăng ký ngôn ngữ tiếng Việt
-  setDefaultLocale("vi"); // Đặt ngôn ngữ mặc định là tiếng Việt
-  const [fullname, setFullname] = useState("");
-  const [email, setEmail] = useState("");
-  const [numberPhone, setNumberPhone] = useState("");
-  const [date, setDate] = useState(null);
-  const [gender, setGender] = useState("");
-  const [cccd, setCccd] = useState("");
-  const [tdhv, setTdhv] = useState("");
-  const [tdcm, setTdcm] = useState("");
-  const [showchuyennganh, setshowChuyenNganh] = useState(false);
-  const [chuyennganh, setChuyenNganh] = useState("");
-  const [vtut, setVtut] = useState("");
-  const [taynghe, setTaynghe] = useState("");
-  const [image1, setImage1] = useState(null);
-  const [image2, setImage2] = useState(null);
-  const [targetDate, setTargetDate] = useState("");
-  const [selectedTTTD, setSelectedTTTD] = useState("");
-  const [showForm, SetShowForm] = useState(true);
-
-  const handleNameChange = (e) => {
-    setFullname(e.target.value);
-  };
-
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-  const handleNumberPhoneChange = (e) => {
-    setNumberPhone(e.target.value);
-  };
-  const handleDateChange = (date) => {
-    setDate(date);
-  };
-  const handleCccdChange = (e) => {
-    setCccd(e.target.value);
-  };
-  const handleGenderChange = (e) => {
-    setGender(e.target.value);
-  };
-  const handleTdhvChange = (e) => {
-    setTdhv(e.target.value);
-  };
-  const handleTayngheChange = (e) => {
-    setTaynghe(e.target.value);
-  };
-  const handleTdcmChange = (e) => {
-    setTdcm(e.target.value);
-    setshowChuyenNganh(tdcm.trim() !== " ");
-  };
-  const handleChuyenNganhChange = (e) => {
-    setChuyenNganh(e.target.value);
-  };
-
-  const handleImage1Change = (event) => {
-    setImage1(event.target.files[0]);
-  };
-
-  const handleVtutChange = (e) => {
-    setVtut(e.target.value);
-  };
-
-  const handleImage2Change = (event) => {
-    setImage2(event.target.files[0]);
-  };
-
-  const handleShowForm = (e) => {
-    SetShowForm(false);
-  };
-  const handleTTTDChange = (event) => {
-    setSelectedTTTD(event.target.value);
-  };
+  const [items, setItems] = useState([]);
+  const [smsText, setSmsText] = useState("");
+  // const [exportedData, setExportedData] = useState(false);
+  const [eventTriggered, setEventTriggered] = useState(false);
 
   useEffect(() => {
-    const today = new Date().getDay();
-    let nextTargetDay;
-
-    if (today === 0 || today === 1 || today === 2 || today === 3) {
-      nextTargetDay = 4; // Nếu là thứ 2, thứ 3 hoặc thứ 4, chọn thứ 5 làm mục tiêu
-    } else {
-      nextTargetDay = 1; // Ngược lại, chọn thứ 2 làm mục tiêu
+    console.log(items);
+    fetchDataFromMongoDB();
+    // Hàm này được gọi mỗi khi eventTriggered thay đổi
+    if (eventTriggered) {
+      // Tải lại trang khi eventTriggered được kích hoạt
+      window.location.reload();
     }
+  }, [eventTriggered]);
 
-    const date = new Date();
-    date.setDate(date.getDate() + ((nextTargetDay - date.getDay() + 7) % 7));
-    setTargetDate(format(date, "dd/MM/yyyy"));
-  }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const fetchDataFromMongoDB = async () => {
     try {
-      const formData = new FormData();
-      formData.append("fullname", fullname);
-      formData.append("email", email);
-      formData.append("numberPhone", numberPhone);
-      formData.append("date", format(date, "dd/MM/yyyy"));
-      formData.append("cccd", cccd);
-      formData.append("gender", gender);
-      formData.append("tdhv", tdhv);
-      formData.append("taynghe", taynghe);
-      formData.append("chuyenmon", tdcm);
-      formData.append("chuyennganh", chuyennganh);
-      formData.append("vtut", vtut);
-      formData.append("tttd", selectedTTTD);
-      formData.append("images", image1);
-      formData.append("images", image2);
-
-      const response = await axios.post(
-        // "http://tuyendung.vietlonghung.com.vn/api/register",
-        // "http://171.244.39.8:30002/api/register",
-        // "https://tuyendung-vlh.onrender.com/api/register",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+      const response = await axios.get(
+        "http://tuyendung.vietlonghung.com.vn:30002/api/admin/users"
       );
-
-      alert(
-        `Chúc mừng ${fullname} đã đăng ký thành công. \n Mời bạn đến Cổng bảo vệ Công ty vào lúc 7 giờ 30 phút sáng ngày ${targetDate} để được hướng dẫn đến địa điểm hoàn thiện thủ tục nhận việc (vui lòng mặc áo sơ mi trắng, mang theo CCCD/CMND bản gốc và hồ sơ ứng tuyển, chuẩn bị bút xanh, cơm trưa và nước uống để nhận việc)`
-      );
-      // Reset các Input
-      setFullname("");
-      setCccd("");
-      setDate(null);
-      setEmail("");
-      setGender("");
-      setTdhv("");
-      setTdcm("");
-      setTaynghe("");
-      setChuyenNganh("");
-      setNumberPhone("");
-      setVtut("");
-      setshowChuyenNganh(false);
-      setImage1(null);
-      setImage2(null);
+      setItems(response.data);
+      console.log(response.data);
     } catch (error) {
-      console.error("Error uploading images:", error);
-      alert("Đã có lỗi hãy kiểm tra lại");
+      console.error("Error fetching data:", error);
     }
+  };
+
+  const renderTable = () => {
+    return (
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Họ và Tên</th>
+            <th>Email</th>
+            <th>Số điện thoại</th>
+            <th>Ngày Sinh</th>
+            <th>Giới tính</th>
+            <th>Căn cước công nhân</th>
+            <th>Trình độ học vấn</th>
+            <th>Vị trí ứng tuyển</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.slice(0).map((item, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{item.fullname}</td>
+              <td>{item.email}</td>
+              <td>{item.numberPhone}</td>
+              <td>{item.date}</td>
+              <td>{item.gender}</td>
+              <td>{item.cccd}</td>
+              <td>{item.tdhv}</td>
+              <td>{item.vtut}</td>
+              <textarea
+                id={item._id}
+                value={smsText}
+                onChange={(e) => setSmsText(e.target.value)}
+                required
+              />
+              <br />
+              <button
+                value={item.numberPhone}
+                onClick={() => handleSendSMS(item.numberPhone)}
+              >
+                Gửi SMS
+              </button>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+
+  // const exportToExcel = (e) => {
+  //   // console.log(items);
+  //   // const wb = XLSX.utils.book_new();
+  //   // const header = [];
+  //   // const ws = XLSX.utils.aoa_to_sheet([[header]]);
+  //   // XLSX.utils.sheet_add_json(ws, items, { header });
+  //   // XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+  //   // XLSX.writeFile(wb, "mongodb_data.xlsx");
+  //   e.preventDefault();
+  //   console.log(items);
+
+  //   const apiURL =
+  //     "https://sheet.best/api/sheets/b096ee2b-3a83-41ac-bb22-8e3a6459656d";
+
+  //   // Lấy dữ liệu hiện có từ API
+  //   axios
+  //     .get(apiURL)
+  //     .then((response) => {
+  //       const existingData = response.data;
+
+  //       // Gửi dữ liệu mới nếu không bị trùng lặp
+  //       axios
+  //         .post(apiURL, items)
+  //         .then((postResponse) => {
+  //           console.log("Response:", postResponse);
+  //           alert("Dữ liệu đã được gửi thành công!");
+  //         })
+  //         .catch((postError) => {
+  //           console.error("Có lỗi xảy ra khi gửi dữ liệu!", postError);
+  //           alert("Có lỗi xảy ra khi gửi dữ liệu.");
+  //         });
+  //     })
+  //     .catch((getError) => {
+  //       console.error("Có lỗi xảy ra khi lấy dữ liệu hiện có!", getError);
+  //       alert("Có lỗi xảy ra khi kiểm tra dữ liệu hiện có.");
+  //     });
+  // };
+
+  const handleExport = async () => {
+    try {
+      const response = await axios.get(
+        "http://tuyendung.vietlonghung.com.vn:30002/export"
+      );
+      console.log(response.data);
+      alert(response.data);
+    } catch (error) {
+      console.error("Error exporting data:", error);
+      alert("Error exporting data");
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    const confirmation = window.confirm(
+      "Bạn có chắc chắn muốn xóa tất cả dữ liệu không?"
+    );
+    if (confirmation) {
+      try {
+        const response = await axios.delete(
+          "http://tuyendung.vietlonghung.com.vn:30002/api/delete-all"
+        );
+        alert(response.data.message);
+        fetchDataFromMongoDB(); // Fetch data lại sau khi xóa
+      } catch (error) {
+        // setError("Lỗi khi xóa dữ liệu");
+        console.error("Lỗi khi xóa dữ liệu:", error);
+        alert("Lỗi khi xóa dữ liệu");
+      }
+    }
+  };
+
+  const deleteData = (id) => {
+    console.log(id);
+    try {
+      axios.delete(`http://tuyendung.vietlonghung.com.vn:30002/api/data/${id}`);
+      // return;
+      console.log("Data deleted successfully");
+      setEventTriggered(true);
+      alert("Xóa Thành công");
+    } catch (error) {
+      console.error("Error deleting data:", error);
+    }
+  };
+
+  const handleSendSMS = (numberPhone) => {
+    // Gửi yêu cầu gửi tin nhắn tới backend
+    axios
+      .post("http://localhost:5000/api/admin/sendSMS", {
+        numberPhone,
+        smsText,
+      })
+      .then((response) => {
+        console.log(` sdt nhận: ${numberPhone}`);
+        console.log(response.data);
+        setSmsText();
+        alert("Tin nhắn đã được gửi!");
+      })
+      .catch((error) => {
+        console.error("Đã có lỗi xảy ra khi gửi tin nhắn:", error);
+        alert("Đã có lỗi xảy ra khi gửi tin nhắn!");
+      });
   };
 
   return (
-    <div className="App">
-      {showForm ? (
-        <>
-          <div className="registration-form-container">
+    <div className="container">
+      <h1>Danh sách người dùng</h1>
+      {/* <button onClick={exportToExcel}>Export to Excel</button> */}
+      <div className="dislay-btn">
+        <button class="print-btn" onClick={handleExport}>
+          <span class="printer-wrapper">
+            <span class="printer-container">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 92 75"
+              >
+                <path
+                  stroke-width="5"
+                  stroke="black"
+                  d="M12 37.5H80C85.2467 37.5 89.5 41.7533 89.5 47V69C89.5 70.933 87.933 72.5 86 72.5H6C4.067 72.5 2.5 70.933 2.5 69V47C2.5 41.7533 6.75329 37.5 12 37.5Z"
+                ></path>
+                <mask fill="white" id="path-2-inside-1_30_7">
+                  <path d="M12 12C12 5.37258 17.3726 0 24 0H57C70.2548 0 81 10.7452 81 24V29H12V12Z"></path>
+                </mask>
+                <path
+                  mask="url(#path-2-inside-1_30_7)"
+                  fill="black"
+                  d="M7 12C7 2.61116 14.6112 -5 24 -5H57C73.0163 -5 86 7.98374 86 24H76C76 13.5066 67.4934 5 57 5H24C20.134 5 17 8.13401 17 12H7ZM81 29H12H81ZM7 29V12C7 2.61116 14.6112 -5 24 -5V5C20.134 5 17 8.13401 17 12V29H7ZM57 -5C73.0163 -5 86 7.98374 86 24V29H76V24C76 13.5066 67.4934 5 57 5V-5Z"
+                ></path>
+                <circle fill="black" r="3" cy="49" cx="78"></circle>
+              </svg>
+            </span>
+
+            <span class="printer-page-wrapper">
+              <span class="printer-page"></span>
+            </span>
+          </span>
+          Export to Excel
+        </button>
+        <button onClick={handleDeleteAll} class="noselect">
+          <span class="text">Delete All</span>
+          <span class="icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+            >
+              <path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"></path>
+            </svg>
+          </span>
+        </button>
+      </div>
+
+      <ul>
+        {items.map((item) => (
+          <li key={item._id}>
+            <h2>Họ và tên: {item.fullname}</h2>
+            <p>Email: {item.email}</p>
+            <p>Số Điện thoại:{item.numberPhone}</p>
+            <p>Ngày sinh:{item.date}</p>
+            <p>Giới tính: {item.gender}</p>
+            <p>Căn cước công dân: {item.cccd}</p>
+            <p>Vị trí ứng tuyển: {item.vtut}</p>
+            <p>{item.henPV}</p>
+            <p>Ảnh căn cước công dân mặt trước:</p>
             <img
-              className="img img-m"
-              alt="Ảnh Công ty Việt Long Hưng"
-              src="https://i.imgur.com/eJpEKzv.jpeg"
+              className="image"
+              src={item.imageUrl1}
+              alt={`CCCD mặt trước ${item.fullname}`}
             />
-
-            <div className="_section">
-              <div class="_title_sub">
-                <img className="_img" src="https://i.imgur.com/ZK5liMX.jpeg" />
-                <div>
-                  <p class="text vn">
-                    Liên tục đổi mới
-                    <span className="mb-en en"> Constantly innovation: </span>
-                    Chúng tôi không ngừng học hỏi, sáng tạo, liên tục đổi mới
-                    phương thức quản lý, nỗ lực dẫn đầu công nghệ và sản xuất
-                    sản phẩm mới.{" "}
-                    <span class="text en mb-text_en">
-                      We constantly learn, create, continuouly innovate
-                      management method, strive to lead in technology and
-                      produce new products
-                    </span>
-                  </p>
-                  <p class="text vn">
-                    Khách hàng là trọng tâm
-                    <span className="en"> Customer focus:</span> Yếu tố then
-                    chốt trong hoạt động điều hành của chúng tôi là cung cấp
-                    chất lượng sản phẩm dịch vụ vượt trội, gắn kết và phát triển
-                    bền vững cùng khách hàng.{" "}
-                    <span class="text en">
-                      The key element in our operation management is to provide
-                      outstanding quality of products and services, align
-                      suitable development with our customers.
-                    </span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <section class="_section">
-              <div className="_title_sub">
-                <img className="_img" src="https://i.imgur.com/E4trgML.jpeg" />
-
-                <div>
-                  TẦM NHÌN -<span class="mb-en en"> VISION</span>
-                  <p class="text vn">
-                    Trở thành nhà sản xuất tin tưởng của thương hiệu hàng đầu
-                    thế giới.{" "}
-                    <span class="text en mb-text">
-                      Become the trusted manufacturer of world's leading brands.
-                    </span>
-                  </p>
-                </div>
-              </div>
-
-              <div className="_title_sub">
-                <img className="_img" src="https://i.imgur.com/kLMfmXc.jpeg" />
-                <div>
-                  SỨ MỆNH - <span class="en">MISSION</span>
-                  <p class="text vn">
-                    Không ngừng nâng cao Trách nhiệm xã hội, Văn hóa An toàn và
-                    Chất lượng, Cải tiến liên tục và Phát triển Bền vững nhắm
-                    mang chất lượng sản phẩm và dịch vụ vượt trội* đến khách
-                    hàng.{" "}
-                    <span class="text en">
-                      Continuously improve Social Responsibility, Culture of
-                      Safety and Quality, Continuous Improvement and Sustainable
-                      Develepment to bring out standing products and services to
-                      the customers.
-                    </span>
-                  </p>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          <button className="animated-button" onClick={handleShowForm}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="arr-2"
-              viewBox="0 0 24 24"
+            <p>Ảnh căn cước công dân mặt sau:</p>
+            <img
+              className="image"
+              src={item.imageUrl2}
+              alt={`CCCD mặt sau ${item.fullname}`}
+            />
+            {/* <p>Nội dung SMS</p>
+            <textarea
+              id={item._id}
+              value={smsText}
+              onChange={(e) => setSmsText(e.target.value)}
+              required
+            />
+            <br />
+            <button
+              value={item.numberPhone}
+              onClick={() => handleSendSMS(item.numberPhone)}
             >
-              <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-            </svg>
-            <span className="text">Tiếp Theo</span>
-            <span className="circle"></span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="arr-1"
-              viewBox="0 0 24 24"
-            >
-              <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
-            </svg>
-          </button>
-        </>
-      ) : (
-        <div className="registration-form-container">
-          <h2>Đăng ký</h2>
-          <form onSubmit={handleSubmit} className="registration-form">
-            <label>Họ và Tên</label>
-            <input
-              type="text"
-              name="fullname"
-              required
-              value={fullname}
-              onChange={handleNameChange}
-              placeholder="Họ và Tên"
-              className="input-field"
-            />
-            <label>Số điện thoại</label>
-            <input
-              type="number"
-              name="numberPhone"
-              required
-              value={numberPhone}
-              onChange={handleNumberPhoneChange}
-              placeholder="Số điện thoại"
-              className="input-field"
-            />
-            <label>Ngày sinh</label>
-            <DatePicker
-              selected={date}
-              onChange={handleDateChange}
-              dateFormat="dd/MM/yyyy"
-              className="input-field"
-              placeholderText="Ngày sinh"
-              locale="vi"
-              showYearDropdown
-              scrollableYearDropdown
-              yearDropdownItemNumber={100}
-            />
-            <label>Giới tính</label>
-            <select value={gender} onChange={handleGenderChange}>
-              <option value="">Chọn giới tính</option>
-              <option value="Nam">Nam</option>
-              <option value="Nữ">Nữ</option>
-            </select>
-            <label>Căn cước công dân/ Chứng minh nhân dân</label>
-            <input
-              type="text"
-              name="cccd"
-              required
-              value={cccd}
-              onChange={handleCccdChange}
-              placeholder="Căn cước công dân/ Chứng minh nhân dân"
-              className="input-field"
-            />
-            <label>Email (Nếu có)</label>
-            <input
-              type="email"
-              name="email"
-              value={email}
-              onChange={handleEmailChange}
-              placeholder="Email"
-              className="input-field"
-            />
-            <label>Trình độ văn hóa VD: 12/12</label>
-            <select value={tdhv} onChange={handleTdhvChange}>
-              <option value="">Trình độ học vấn của Ứng Viên</option>
-              <option value="1/12">1/12</option>
-              <option value="2/12">2/12</option>
-              <option value="3/12">3/12</option>
-              <option value="4/12">4/12</option>
-              <option value="5/12">5/12</option>
-              <option value="6/12">6/12</option>
-              <option value="7/12">7/12</option>
-              <option value="8/12">8/12</option>
-              <option value="9/12">9/12</option>
-              <option value="10/12">10/12</option>
-              <option value="11/12">11/12</option>
-              <option value="12/12">12/12</option>
-            </select>
-            <label>Trình độ chuyên môn (nếu có)</label>
-            <span>Ví dụ: Đại học - Ngành Quản trị kinh doanh</span>
-            <select value={tdcm} onChange={handleTdcmChange}>
-              <option value=" ">Chuyên Môn của Ứng Viên (nếu có)</option>
-              <option value="Trung Cấp">Trung Cấp</option>
-              <option value="Cao Đẳng">Cao Đẳng</option>
-              <option value="Đại Học">Đại Học</option>
-            </select>
-            {showchuyennganh && (
-              <input
-                type="text"
-                value={chuyennganh}
-                onChange={handleChuyenNganhChange}
-                className="input-field"
-                placeholder="Chuyên ngành của Ứng viên"
-              />
-            )}
-            <label>Tay nghề</label>
-            <select value={taynghe} onChange={handleTayngheChange}>
-              <option value="">Tay nghề của Ứng viên</option>
-              <option value="Biết may">Biết May</option>
-              <option value="Không biết may">Không biết may</option>
-            </select>
-            <label>
-              Sau khi nghiên cứu nội dung thông báo tuyển lao động, tôi đăng ký
-              dự tuyển vào vị trí:
-            </label>
-            <select value={vtut} onChange={handleVtutChange}>
-              <option value="">Chọn vị trí ứng tuyển</option>
-              <option value="Công nhân may">Công nhân may</option>
-              <option value="Công nhân cắt">Công nhân cắt</option>
-              <option value="Công nhân ủi">Công nhân ủi</option>
-              <option value="Đóng gói">Đóng gói</option>
-              <option value="Kiểm hóa">Kiểm hóa</option>
-              <option value="Nhân viên kho">Nhân viên kho</option>
-              <option value="Nhân viên cơ điện">Nhân viên cơ điện</option>
-              <option value="Bảo vệ">Bảo vệ</option>
-              <option value="Nhân viên Văn phòng">Nhân viên Văn phòng</option>
-            </select>
-            <label>Bạn biết thông tin tuyển dụng qua đâu?</label>
-            <select value={selectedTTTD} onChange={handleTTTDChange}>
-              <option value="">Bạn biết thông tin tuyển dụng qua đâu</option>
-              <option value="Facebook">Facebook</option>
-              <option value="Cổng bảo vệ Công ty">Cổng bảo vệ Công ty</option>
-              <option value="Băng rôn">Băng rôn</option>
-              <option value="Người thân giới thiệu">
-                Người thân giới thiệu
-              </option>
-            </select>
-            <h2>
-              Sau khi đã điền đầy đủ thông tin ứng tuyển, bạn vui lòng gửi hình
-              ảnh 2 mặt Căn cước công dân/Chứng minh nhân dân để Phòng Nhân sự
-              của Công ty hoàn thiện thủ tục hồ sơ ứng tuyển.
-            </h2>
-            <label>
-              Hình CCCD mặt trước:
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImage1Change}
-              />
-            </label>
-            <label>
-              Hình CCCD mặt sau:
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImage2Change}
-              />
-            </label>
-            <button type="submit" className="submit-button">
-              Đăng ký
+              Gửi SMS
+            </button> */}
+            {/* <img src={item.image} alt={item.fullname} /> */}
+            <br />
+            <button class="bin-button" onClick={() => deleteData(item._id)}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 39 7"
+                class="bin-top"
+              >
+                <line
+                  stroke-width="4"
+                  stroke="white"
+                  y2="5"
+                  x2="39"
+                  y1="5"
+                ></line>
+                <line
+                  stroke-width="3"
+                  stroke="white"
+                  y2="1.5"
+                  x2="26.0357"
+                  y1="1.5"
+                  x1="12"
+                ></line>
+              </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 33 39"
+                class="bin-bottom"
+              >
+                <mask fill="white" id="path-1-inside-1_8_19">
+                  <path d="M0 0H33V35C33 37.2091 31.2091 39 29 39H4C1.79086 39 0 37.2091 0 35V0Z"></path>
+                </mask>
+                <path
+                  mask="url(#path-1-inside-1_8_19)"
+                  fill="white"
+                  d="M0 0H33H0ZM37 35C37 39.4183 33.4183 43 29 43H4C-0.418278 43 -4 39.4183 -4 35H4H29H37ZM4 43C-0.418278 43 -4 39.4183 -4 35V0H4V35V43ZM37 0V35C37 39.4183 33.4183 43 29 43V35V0H37Z"
+                ></path>
+                <path stroke-width="4" stroke="white" d="M12 6L12 29"></path>
+                <path stroke-width="4" stroke="white" d="M21 6V29"></path>
+              </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 89 80"
+                class="garbage"
+              >
+                <path
+                  fill="white"
+                  d="M20.5 10.5L37.5 15.5L42.5 11.5L51.5 12.5L68.75 0L72 11.5L79.5 12.5H88.5L87 22L68.75 31.5L75.5066 25L86 26L87 35.5L77.5 48L70.5 49.5L80 50L77.5 71.5L63.5 58.5L53.5 68.5L65.5 70.5L45.5 73L35.5 79.5L28 67L16 63L12 51.5L0 48L16 25L22.5 17L20.5 10.5Z"
+                ></path>
+              </svg>
             </button>
-          </form>
-        </div>
-      )}
+
+            {/* <button onClick={() => deleteData(item._id)}>Xóa</button> */}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
